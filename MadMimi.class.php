@@ -223,5 +223,15 @@ class MadMimi {
 		}
 		return false;
 	}
+	
+	/**
+	* Search for user, return true if email found
+	* $email Users email
+	*/
+	function HaveUser($email)
+	{
+		$user_array = new SimpleXMLElement($this->Search($email));
+		return count($user_array) > 0;
+	}
 }
 ?>
