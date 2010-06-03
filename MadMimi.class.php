@@ -44,7 +44,8 @@ class MadMimi {
 	}
 	function DoRequest($path, $options, $return_status = false, $method = 'GET', $mail = false) {
 		$url = "";
-		$request_options = http_build_query($options);
+		$request_options = "?";
+		$request_options .= http_build_query($options);
 		if ($mail == false) {
 			$url .= "http://api.madmimi.com{$path}";
 		} else {
@@ -85,10 +86,6 @@ class MadMimi {
 			return $result;
 		}
 	}
-	function to_yaml($arr) {
-		$yaml = Spyc::YAMLDump($arr);
-		return $yaml;
-	}
 	function build_csv($arr) {
 		$csv = "";
 		$keys = array_keys($arr);
@@ -110,7 +107,7 @@ class MadMimi {
 		return $request;
 	}
 	function Lists($return = true) {
-		$request = $this->DoRequest('/audience_lists/lists.xml?', $this->default_options(), $return);
+		$request = $this->DoRequest('/audience_lists/lists.xml', $this->default_options(), $return);
 		return $request;
 	}
 	function AddUser($user, $return = false) {
@@ -123,7 +120,7 @@ class MadMimi {
 		return $request;
 	}
 	function Memberships($email, $return = true) {
-		$url = str_replace('%email%', $email, '/audience_members/%email%/lists.xml?');
+		$url = str_replace('%email%', $email, '/audience_members/%email%/lists.xml');
 		$request = $this->DoRequest($url, $this->default_options(), $return);
 		return $request;
 	}
@@ -138,7 +135,7 @@ class MadMimi {
 		foreach ($lists as $list) {
 			if (strcmp(trim($list['name']), trim($list_name)) === 0) {
 				$options = array('value' => $new_list_name) + $this->default_options();
-				$request = $this->DoRequest('/audience_lists/set_list_name/' . $list['id'] . '?', $options, $return, 'GET');
+				$request = $this->DoRequest('/audience_lists/set_list_name/' . $list['id'], $options, $return, 'GET');
 				break;
 			}
 		}
@@ -149,10 +146,11 @@ class MadMimi {
 		$request = $this->DoRequest('/audience_lists/' . rawurlencode($list_name), $options, $return, 'POST');
 		return $request;
 	}
-	function SendMessage($options, $yaml_body, $return = false) {
-		$yaml = $this->to_yaml($yaml_body);
+	function SendMessage($options, $yaml_body = null, $return = false) {
+		if (class_exists('Spyc') && $yaml_body != null) {
+			$options['body'] = Spyc::YAMLDump($yaml_body);
+		}
 		$options = $options + $this->default_options();
-		$options['body'] = $yaml;
 		if ($options['list_name']) {
 			$request = $this->DoRequest('/mailer/to_list', $options, $return, 'POST', true);
 		} else {
@@ -187,25 +185,24 @@ class MadMimi {
 		return $request;
 	}
 	function SuppressedSince($unix_timestamp, $return = true) {
-		$request = $this->DoRequest('/audience_members/suppressed_since/' . $unix_timestamp . '.txt?', $this->default_options(), $return);
+		$request = $this->DoRequest('/audience_members/suppressed_since/' . $unix_timestamp . '.txt', $this->default_options(), $return);
 		return $request;
 	}
 	function Promotions($return = true) {
-		$request = $this->DoRequest('/promotions.xml?', $this->default_options(), $return);
+		$request = $this->DoRequest('/promotions.xml', $this->default_options(), $return);
 		return $request;
 	}
 	function MailingStats($promotion_id, $mailing_id, $return = false) {
-		$url = str_replace("%promotion_id%", $promotion_id, "/promotions/%promotion_id%/mailings/%mailing_id%.xml?");
+		$url = str_replace("%promotion_id%", $promotion_id, "/promotions/%promotion_id%/mailings/%mailing_id%.xml");
 		$url = str_replace("%mailing_id%", $mailing_id, $url);
 		$request = $this->DoRequest($url, $this->default_options(), $return);
 		return $request;
 	}
 	function Search($query_string, $raw = false, $return = true) {
 		$options = array('query' => $query_string, 'raw' => $raw) + $this->default_options();
-		$request = $this->DoRequest('/audience_members/search.xml?', $options, $return);
+		$request = $this->DoRequest('/audience_members/search.xml', $options, $return);
 		return $request;
 	}
-	# Note: these new functions should work, but consider them beta until further testing.
 	function Events($unix_timestamp, $return = true) {
 		$request = $this->DoRequest('/audience_members/events_since/' . $unix_timestamp . '.xml', $this->default_options(), $return);
 		return $request;
