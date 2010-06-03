@@ -223,4 +223,5 @@ class MadMimi {
 		}
 		return false;
 	}
+}
 ?>
