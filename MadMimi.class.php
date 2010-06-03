@@ -233,5 +233,23 @@ class MadMimi {
 		$user_array = new SimpleXMLElement($this->Search($email));
 		return count($user_array) > 0;
 	}
+	
+	/**
+	* Checks if user is suppressed
+	* $email Users email
+	* return true/false and null if user not found
+	*/
+	function IsSuppressed($email)
+	{
+		$status = $this->DoRequest('/audience_members/'.$email.'/is_suppressed', $this->default_options(), true, 'GET');
+		if ($status == 'false') {
+			return false;
+		} else
+		if ($status == 'true') {
+			return true;
+		} else {
+			return null;
+		}
+	}
 }
 ?>
