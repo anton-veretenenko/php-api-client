@@ -44,7 +44,7 @@ class MadMimi {
 	}
 	function DoRequest($path, $options, $return_status = false, $method = 'GET', $mail = false) {
 		$url = "";
-		$request_options = $this->build_request_string($options);
+		$request_options = http_build_query($options);
 		if ($mail == false) {
 			$url .= "http://api.madmimi.com{$path}";
 		} else {
@@ -55,7 +55,11 @@ class MadMimi {
 		}
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		if ($return_status == true) {
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+		} else {
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		}
 		switch($method) {
 			case 'GET':
 				break;
@@ -80,10 +84,6 @@ class MadMimi {
 		if ($return_status == true && $this->debug == false) {
 			return $result;
 		}
-	}
-	function build_request_string($arr) {
-    # Breaks PHP4 support, but is much neater. Credit to gorilla3d. ;)    
-    return http_build_query($arr);
 	}
 	function to_yaml($arr) {
 		$yaml = Spyc::YAMLDump($arr);
@@ -158,6 +158,7 @@ class MadMimi {
 		} else {
 			$request = $this->DoRequest('/mailer', $options, $return, 'POST', true);
 		}
+		return $request;
 	}
 	function SendHTML($options, $html, $return = false) {
 		if ((!strstr($html, '[[tracking_beacon]]')) || (!strstr($html, '[[peek_image]]'))) {
@@ -183,6 +184,7 @@ class MadMimi {
 		} else {
 			$request = $this->DoRequest('/mailer', $options, $return, 'POST', true);
 		}
+		return $request;
 	}
 	function SuppressedSince($unix_timestamp, $return = true) {
 		$request = $this->DoRequest('/audience_members/suppressed_since/' . $unix_timestamp . '.txt?', $this->default_options(), $return);
@@ -203,6 +205,14 @@ class MadMimi {
 		$request = $this->DoRequest('/audience_members/search.xml', $options, $return);
 		return $request;
 	}
+	# Note: these new functions should work, but consider them beta until further testing.
+	function Events($unix_timestamp, $return = true) {
+		$request = $this->DoRequest('/audience_members/events_since/' . $unix_timestamp . '.xml', $this->default_options(), $return);
+		return $request;
+	}
+	function Suppress($email, $return = false) {
+		$request = $this->DoRequest('/audience_members/' . $email . '/suppress_email', $this->default_options(), $return, 'POST');
+	}
 	/*
 	 *	Check for username/key authentication
 	 */
@@ -210,8 +220,7 @@ class MadMimi {
 		$output = strtolower($this->Lists(true));
 		if (strpos($output, 'unable to authenticate') === false) {
 			return true;
-		}		
+		}
 		return false;
 	}
-}
 ?>
