@@ -1,4 +1,8 @@
 # MadMimi for PHP
+with new functions:
+ Authenticate()
+ RenameList()
+ HaveUser()
 
 ## Notes on basic usage:
 $mimi = new MadMimi('username', 'api_key');
