@@ -7,7 +7,8 @@
 	
 	_______________________________________
 
-	Copyright (c) 2010 Nicholas Young <nicholas@madmimi.com>
+	Copyright (C) 2010 Mad Mimi LLC 
+	Authored by Nicholas Young <nicholas@madmimi.com> ...and a host of contributors.
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +45,10 @@ class MadMimi {
 	}
 	function DoRequest($path, $options, $return_status = false, $method = 'GET', $mail = false) {
 		$url = "";
-		$request_options = "";
 		if ($method == 'GET') {
 			$request_options = "?";
+		} else {
+			$request_options = "";
 		}
 		$request_options .= http_build_query($options);
 		if ($mail == false) {
