@@ -156,7 +156,7 @@ class MadMimi {
 			$options['body'] = Spyc::YAMLDump($yaml_body);
 		}
 		$options = $options + $this->default_options();
-		if ($options['list_name']) {
+		if (!empty($options['list_name'])) {
 			$request = $this->DoRequest('/mailer/to_list', $options, $return, 'POST', true);
 		} else {
 			$request = $this->DoRequest('/mailer', $options, $return, 'POST', true);
@@ -169,7 +169,7 @@ class MadMimi {
 		}
 		$options = $options + $this->default_options();
 		$options['raw_html'] = $html;
-		if ($options['list_name']) {
+		if (!empty($options['list_name'])) {
 			$request = $this->DoRequest('/mailer/to_list', $options, $return, 'POST', true);
 		} else {
 			$request = $this->DoRequest('/mailer', $options, $return, 'POST', true);
@@ -182,7 +182,7 @@ class MadMimi {
 		}
 		$options = $options + $this->default_options();
 		$options['raw_plain_text'] = $message;
-		if ($options['list_name']) {
+		if (!empty($options['list_name'])) {
 			$request = $this->DoRequest('/mailer/to_list', $options, $return, 'POST', true);
 		} else {
 			$request = $this->DoRequest('/mailer', $options, $return, 'POST', true);
